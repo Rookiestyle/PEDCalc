@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Translation>
+  <TranslationVersion>3</TranslationVersion>
+  <item>
+    <key>Active</key>
+    <value>PEDCalc ist aktiv</value>
+  </item>
+  <item>
+    <key>Inactive</key>
+    <value>PEDCalc ist nicht aktiv</value>
+  </item>
+  <item>
+    <key>AskRecalcAll</key>
+    <value>Gültigkeitsdatum aller Einträge neu berechnen?</value>
+  </item>
+  <item>
+    <key>AskRecalcSingle</key>
+    <value>Gültigkeitsdatum neu berechnen?</value>
+  </item>
+  <item>
+    <key>OptionsInactive</key>
+    <value>Inaktiv</value>
+  </item>
+  <item>
+    <key>OptionsInherit</key>
+    <value>Übernehmen: {0}</value>
+  </item>
+  <item>
+    <key>OptionsExpire</key>
+    <value>Abgelaufen</value>
+  </item>
+  <item>
+    <key>UnitDays</key>
+    <value>Tage</value>
+  </item>
+  <item>
+    <key>UnitWeeks</key>
+    <value>Wochen</value>
+  </item>
+  <item>
+    <key>UnitMonths</key>
+    <value>Monate</value>
+  </item>
+  <item>
+    <key>UnitYears</key>
+    <value>Jahre</value>
+  </item>
+  <item>
+    <key>InheritInherit</key>
+    <value>übernehmen</value>
+  </item>
+  <item>
+    <key>ErrorInitExpiryDate</key>
+    <value>Das Gültigkeitsdatum konnte nicht auf {0} gesetzt werden</value>
+  </item>
+  <item>
+	<key>NewExpiryDateTooltip</key>
+	<value>Das ist das neue Ablaufdatum, es wird bei einer Passwortänderung automatisch gesetzt.
+
+Zum Ändern passe das Ablaufdatum einfach manuell an.</value>
+  </item>
+</Translation>

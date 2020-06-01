@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Translation>
+  <TranslationVersion>2</TranslationVersion>
+  <item>
+    <key>Active</key>
+    <value>PEDCalc est activé</value>
+  </item>
+  <item>
+    <key>Inactive</key>
+    <value>PEDCalc est désactivé</value>
+  </item>
+  <item>
+    <key>AskRecalcAll</key>
+    <value>Recalculer la date d'expiration des entrées sélectionnées ?</value>
+  </item>
+  <item>
+    <key>AskRecalcSingle</key>
+    <value>Recalculer la date d'expiration ?</value>
+  </item>
+  <item>
+    <key>OptionsInactive</key>
+    <value>Inactive</value>
+  </item>
+  <item>
+    <key>OptionsInherit</key>
+    <value>Héritée : {0}</value>
+  </item>
+  <item>
+    <key>OptionsExpire</key>
+    <value>Expirer</value>
+  </item>
+  <item>
+    <key>UnitDays</key>
+    <value>jours</value>
+  </item>
+  <item>
+    <key>UnitWeeks</key>
+    <value>semaines</value>
+  </item>
+  <item>
+    <key>UnitMonths</key>
+    <value>mois</value>
+  </item>
+  <item>
+    <key>UnitYears</key>
+    <value>années</value>
+  </item>
+  <item>
+    <key>InheritInherit</key>
+    <value>héritée</value>
+  </item>
+  <item>
+    <key>ErrorInitExpiryDate</key>
+    <value>Impossible d'expirer l'entrée à la date {0}</value>
+  </item>
+  <item>
+    <key>NewExpiryDateTooltip</key>
+    <value>C'est la date d'expiration pré-calculée.
+Celle-ci sera mise à jour automatiquement si vous enregistrez la modification du mot de passe.
+
+Pour l'annuler, entrez manuellement une date d'expiration.</value>
+  </item>
+</Translation>

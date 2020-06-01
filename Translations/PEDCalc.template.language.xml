@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Translation>
+  <TranslationVersion>0</TranslationVersion>
+  <item>
+    <key>Active</key>
+    <value>PEDCalc is active</value>
+  </item>
+  <item>
+    <key>Inactive</key>
+    <value>PEDCalc is inactive</value>
+  </item>
+  <item>
+    <key>AskRecalcAll</key>
+    <value>Recalculate expiry date of all affected entries?</value>
+  </item>
+  <item>
+    <key>AskRecalcSingle</key>
+    <value>Recalculate expiry date?</value>
+  </item>
+  <item>
+    <key>OptionsInactive</key>
+    <value>Inactive</value>
+  </item>
+  <item>
+    <key>OptionsInherit</key>
+    <value>Inherit: {0}</value>
+  </item>
+  <item>
+    <key>OptionsExpire</key>
+    <value>Expire entries</value>
+  </item>
+  <item>
+    <key>UnitDays</key>
+    <value>days</value>
+  </item>
+  <item>
+    <key>UnitWeeks</key>
+    <value>weeks</value>
+  </item>
+  <item>
+    <key>UnitMonths</key>
+    <value>months</value>
+  </item>
+  <item>
+    <key>UnitYears</key>
+    <value>years</value>
+  </item>
+  <item>
+    <key>InheritInherit</key>
+    <value>inherit</value>
+  </item>
+  <item>
+    <key>ErrorInitExpiryDate</key>
+    <value>Could not set expiry date to {0}</value>
+  </item>
+  <item>
+	<key>NewExpiryDateTooltip</key>
+	<value>This is the pre-calculated expiration date.
+It will be set automatically if you change the entry's password.
+
+To overrride, simply change the expiration date manually.</value>
+  </item>
+</Translation>

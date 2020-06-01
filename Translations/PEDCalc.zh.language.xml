@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Translation>
+  <TranslationVersion>2</TranslationVersion>
+  <item>
+    <key>Active</key>
+    <value>PEDCalc已激活</value>
+  </item>
+  <item>
+    <key>Inactive</key>
+    <value>PEDCalc未激活</value>
+  </item>
+  <item>
+    <key>AskRecalcAll</key>
+    <value>重新计算组内所有条目的有效期?</value>
+  </item>
+  <item>
+    <key>AskRecalcSingle</key>
+    <value>重新计算有效期?</value>
+  </item>
+  <item>
+    <key>OptionsInactive</key>
+    <value>禁用</value>
+  </item>
+  <item>
+    <key>OptionsInherit</key>
+    <value>继承: {0}</value>
+  </item>
+  <item>
+    <key>OptionsExpire</key>
+    <value>立即到期</value>
+  </item>
+  <item>
+    <key>UnitDays</key>
+    <value>日</value>
+  </item>
+  <item>
+    <key>UnitWeeks</key>
+    <value>周</value>
+  </item>
+  <item>
+    <key>UnitMonths</key>
+    <value>月</value>
+  </item>
+  <item>
+    <key>UnitYears</key>
+    <value>年</value>
+  </item>
+  <item>
+    <key>InheritInherit</key>
+    <value>继承</value>
+  </item>
+  <item>
+    <key>ErrorInitExpiryDate</key>
+    <value>无法设置有效期为{0}</value>
+  </item>
+</Translation>
