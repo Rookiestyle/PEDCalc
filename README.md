@@ -1,7 +1,7 @@
 # PEDCalc
 [![Version](https://img.shields.io/github/release/rookiestyle/pedcalc)](https://github.com/rookiestyle/pedcalc/releases/latest)
 [![Releasedate](https://img.shields.io/github/release-date/rookiestyle/pedcalc)](https://github.com/rookiestyle/pedcalc/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/rookiestyle/pedcalc/total?color=%2300cc00)](https://github.com/rookiestyle/pedcalc/releases/latest)\
+[![Downloads](https://img.shields.io/github/downloads/rookiestyle/pedcalc/total?color=%2300cc00)](https://github.com/rookiestyle/pedcalc/releases/latest/download/PEDCalc.plgx)\
 [![License: GPL v3](https://img.shields.io/github/license/rookiestyle/pedcalc)](https://www.gnu.org/licenses/gpl-3.0)
 
 Did you ever change a password in KeePass and forgot to adjust the expiry date?  
@@ -14,7 +14,7 @@ PEDCalc let's you define a *lifetime* (validity period) for passwords and will a
 - [Configuration](#configuration)
 - [Usage](#usage)
 - [Translations](#translations)
-- [Requirements](#requirements)
+- [Download and Requirements](#download-and-requirements)
 
 # Configuration
 There is no complex configuration, PEDCalc is designed to *simply work*.  
@@ -58,5 +58,12 @@ Example: `pedcalc.de.language.xml`
 The language identifier in the filename must match the language identifier inside the KeePass language that you can select using *View -> Change language...*\
 This identifier is shown there as well, if you have [EarlyUpdateCheck](https://github.com/rookiestyle/earlyupdatecheck) installed
 
-# Requirements
+# Download and Requirements
+## Download
+Please follow these links to download the plugin file itself.
+- [Download newest release](https://github.com/rookiestyle/pedcalc/releases/latest/download/PEDCalc.plgx)
+- [Download history](https://github.com/rookiestyle/pedcalc/releases)
+
+If you're interested in any of the available translations in addition, please download them from the [Translations](Translations) folder.
+## Requirements
 * KeePass: 2.39
