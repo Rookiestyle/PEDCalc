@@ -59,4 +59,4 @@ The language identifier in the filename must match the language identifier insid
 This identifier is shown there as well, if you have [EarlyUpdateCheck](https://github.com/rookiestyle/earlyupdatecheck) installed
 
 # Requirements
-* KeePass: 2.38
+* KeePass: 2.39
