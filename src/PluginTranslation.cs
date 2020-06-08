@@ -50,6 +50,9 @@ namespace PluginTranslation
 It will be set automatically if you change the entry's password.
 
 To overrride, simply change the expiration date manually.";
+		public static readonly string ExpireAllEntriesQuestion = @"{0} can affect up to {1} entries in total, {2} out of these {1} will never expire as of now.
+
+Skip those {2} never expiring entries?";
 		#endregion
 
 		#region NO changes in this area

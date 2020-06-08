@@ -252,7 +252,10 @@ namespace PEDCalc
 				if (e.Value.unit == PEDC.SetNeverExpires) e.Value.unit = PEDC.Off;
 				PwGroup pg = m_host.MainWindow.GetSelectedGroup();
 				if (e.Value.unit == PEDC.SetExpired)
-					pg.Expire();
+				{
+					bool bExpireAll = CheckExpireAll(pg);
+					pg.Expire(bExpireAll);
+				}
 				else
 				{
 					pg.SavePEDCString(e.Value);
@@ -264,27 +267,28 @@ namespace PEDCalc
 			}
 			else if (bEntry)
 			{
-				PwEntry[] pe = m_host.MainWindow.GetSelectedEntries();
+				List<PwEntry> lEntries = m_host.MainWindow.GetSelectedEntries().ToList();
 				if (e.Value.unit == PEDC.SetExpired)
 				{
-					foreach (PwEntry entry in pe)
-						entry.Expire();
+					bool bExpireAll = CheckExpireAll(lEntries);
+					foreach (PwEntry entry in lEntries)
+						entry.Expire(bExpireAll);
 				}
 				else
 				{
 					if (e.Value.unit != PEDC.SetNeverExpires)
 					{
-						foreach (PwEntry entry in pe) entry.SavePEDCString(e.Value);
-						if (Configuration.Active && !e.Value.Off && (Tools.AskYesNo(pe.Count() > 1 ? PluginTranslate.AskRecalcAll : PluginTranslate.AskRecalcSingle) == DialogResult.Yes))
+						foreach (PwEntry entry in lEntries) entry.SavePEDCString(e.Value);
+						if (Configuration.Active && !e.Value.Off && (Tools.AskYesNo(lEntries.Count() > 1 ? PluginTranslate.AskRecalcAll : PluginTranslate.AskRecalcSingle) == DialogResult.Yes))
 						{
-							foreach (PwEntry entry in pe)
+							foreach (PwEntry entry in lEntries)
 							{
 								entry.Expires = true;
 								entry.RecalcExpiry(true);
 							}
 						}
 					}
-					foreach (PwEntry entry in pe)
+					foreach (PwEntry entry in lEntries)
 					{
 						Configuration.SkipRecalc = true;
 						if (e.Value.unit == PEDC.SetNeverExpires) entry.Expires = false;
@@ -293,6 +297,25 @@ namespace PEDCalc
 				}
 				Program.MainForm.UpdateUI(false, null, false, null, true, null, true);
 			}
+		}
+
+		private bool CheckExpireAll(PwGroup pg)
+		{
+			return CheckExpireAll(pg.GetEntries(true).ToList());
+		}
+
+		private bool CheckExpireAll(List<PwEntry> lEntries)
+		{
+			if (lEntries.Count < 2) return true; //Expire w/out asking, if only one entry is selected
+
+			int iNotExpiringYet = lEntries.Where(x => !x.Expires).Count();
+			if (iNotExpiringYet == 0) return false; //No entry w/out expiry, no need to ask
+
+			if (iNotExpiringYet == lEntries.Count) return true; //Expire w/out asking, if ALL selected entries have no expiry set
+
+			return Tools.AskYesNo(string.Format(PluginTranslate.ExpireAllEntriesQuestion,
+				PluginTranslate.OptionsExpire, lEntries.Count, iNotExpiringYet)) == DialogResult.No;
+
 		}
 		#endregion
 

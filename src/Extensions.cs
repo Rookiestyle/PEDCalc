@@ -59,14 +59,15 @@ namespace PEDCalc
 			return !bNoRecalc;
 		}
 
-		internal static void Expire(this PwEntry pe)
+		internal static void Expire(this PwEntry pe, bool bExpireAll)
 		{
-			if (!pe.Expires) return;
-			if (pe.ExpiryTime < DateTime.UtcNow) return;
+			if (!pe.Expires && !bExpireAll) return;
+			if (pe.Expires && (pe.ExpiryTime < DateTime.UtcNow)) return;
 
 			Configuration.SkipRecalc = true;
 			PluginDebug.AddInfo("Expire entry", pe.Uuid.ToString());
 			pe.CreateBackup(KeePass.Program.MainForm.ActiveDatabase);
+			pe.Expires = true;
 			pe.ExpiryTime = PEDCalcValue.UnixStart;
 			pe.Touch(true, false);
 		}
@@ -128,15 +129,15 @@ namespace PEDCalc
 			}
 		}
 
-		internal static void Expire(this PwGroup pg)
+		internal static void Expire(this PwGroup pg, bool bExpireAll)
 		{
 			PwObjectList<PwEntry> entries = pg.GetEntries(false);
 			foreach (PwEntry pe in entries)
-				pe.Expire();
+				pe.Expire(bExpireAll);
 
 			PwObjectList<PwGroup> groups = pg.GetGroups(false);
 			foreach (PwGroup g in groups)
-				g.Expire();
+				g.Expire(bExpireAll);
 		}
 
 		internal static PEDCalcValue GetPEDValue(this PwGroup pg, bool recursion)

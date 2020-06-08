@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Translation>
   <TranslationVersion>0</TranslationVersion>
   <item>
@@ -54,10 +54,16 @@
     <value>Could not set expiry date to {0}</value>
   </item>
   <item>
-	<key>NewExpiryDateTooltip</key>
-	<value>This is the pre-calculated expiration date.
+    <key>NewExpiryDateTooltip</key>
+    <value>This is the pre-calculated expiration date.
 It will be set automatically if you change the entry's password.
 
 To overrride, simply change the expiration date manually.</value>
+  </item>
+  <item>
+    <key>ExpireAllEntriesQuestion</key>
+    <value>{0} can affect up to {1} entries in total, {2} out of these {1} will never expire as of now.
+
+Skip those {2} never expiring entries?</value>
   </item>
 </Translation>

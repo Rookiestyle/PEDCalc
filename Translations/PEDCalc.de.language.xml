@@ -1,6 +1,6 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Translation>
-  <TranslationVersion>3</TranslationVersion>
+  <TranslationVersion>4</TranslationVersion>
   <item>
     <key>Active</key>
     <value>PEDCalc ist aktiv</value>
@@ -54,9 +54,15 @@
     <value>Das Gültigkeitsdatum konnte nicht auf {0} gesetzt werden</value>
   </item>
   <item>
-	<key>NewExpiryDateTooltip</key>
-	<value>Das ist das neue Ablaufdatum, es wird bei einer Passwortänderung automatisch gesetzt.
+    <key>NewExpiryDateTooltip</key>
+    <value>Das ist das neue Ablaufdatum, es wird bei einer Passwortänderung automatisch gesetzt.
 
 Zum Ändern passe das Ablaufdatum einfach manuell an.</value>
+  </item>
+  <item>
+    <key>ExpireAllEntriesQuestion</key>
+    <value>Diese Aktion betrifft bis zu {1} Einträge, {2} dieser Einträge haben aktuell kein Ablaufdatum.
+
+Sollen diese {2} nie ablaufenden Einträge übersprungen werden?</value>
   </item>
 </Translation>
