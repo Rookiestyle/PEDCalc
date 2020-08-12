@@ -53,6 +53,10 @@ To overrride, simply change the expiration date manually.";
 		public static readonly string ExpireAllEntriesQuestion = @"{0} can affect up to {1} entries in total, {2} out of these {1} will never expire as of now.
 
 Skip those {2} never expiring entries?";
+		public static readonly string CheckDisable = @"Do you really want to disable {0}?
+The expiry date of an entry will no longer be recalculated when you change the password.
+
+This message will only be displayed once.";
 		#endregion
 
 		#region NO changes in this area

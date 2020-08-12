@@ -66,4 +66,11 @@ To overrride, simply change the expiration date manually.</value>
 
 Skip those {2} never expiring entries?</value>
   </item>
+  <item>
+    <key>CheckDisable</key>
+    <value>Do you really want to disable {0}?
+The expiry date of an entry will no longer be recalculated when you change the password.
+
+This message will only be displayed once.</value>
+  </item>
 </Translation>

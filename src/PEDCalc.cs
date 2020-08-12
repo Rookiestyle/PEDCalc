@@ -234,7 +234,7 @@ namespace PEDCalc
 					pve.valueinherit = new PEDCalcValue(PEDC.Off);
 				m_dPEDValues[pe] = pve;
 				PluginDebug.AddInfo("Add PEDCValues to buffer", 0,
-					"Entry: " + pe.Uuid.ToString() + " / " + pe.Strings.ReadSafe(PwDefs.TitleField),
+					"Entry: " + pe.Uuid.ToHexString() + " / " + pe.Strings.ReadSafe(PwDefs.TitleField),
 					"Value: " + pve.value.ToString(),
 					"Value inherited: " + pve.valueinherit.ToString());
 			}
@@ -252,7 +252,7 @@ namespace PEDCalc
 				string sUnit = pcv_entry.ToString(true);
 				m_dPEDValuesString[pe] = sUnit + (bInherit ? "*" : string.Empty);
 				PluginDebug.AddInfo("Add PEDCValue-string to buffer", 0,
-					"Entry: " + pe.Uuid.ToString() + " / " + pe.Strings.ReadSafe(PwDefs.TitleField),
+					"Entry: " + pe.Uuid.ToHexString() + " / " + pe.Strings.ReadSafe(PwDefs.TitleField),
 					"Value: " + m_dPEDValuesString[pe]);
 			}
 			return m_dPEDValuesString[pe];

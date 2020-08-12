@@ -27,6 +27,14 @@ namespace PEDCalc
 			set { Program.Config.CustomConfig.SetBool(m_ConfigActive, value); }
 		}
 		public static bool SkipRecalc = false;
+
+		private static string m_ConfigFirstTimeDisable = "PEDCalc.FirstTimeDisable";
+		public static bool FirstTimeDisable
+		{
+			get { return Program.Config.CustomConfig.GetBool(m_ConfigFirstTimeDisable, true); }
+			set { Program.Config.CustomConfig.SetBool(m_ConfigFirstTimeDisable, value); }
+		}
+
 	}
 
 	public sealed class PEDCalcExt : Plugin
@@ -57,7 +65,7 @@ namespace PEDCalc
 			Tools.DefaultCaption = PluginTranslate.PluginName;
 			Tools.PluginURL = "https://github.com/rookiestyle/pedcalc/";
 
-			m_iconActive = DPIAwareness.Scale16x16(Resources.pedcalc);
+			m_iconActive = GfxUtil.ScaleImage(Resources.pedcalc, DpiUtil.ScaleIntX(16), DpiUtil.ScaleIntY(16));
 			m_iconInactive = ToolStripRenderer.CreateDisabledImage(m_iconActive);
 
 			PwEntry.EntryTouched += OnEntryTouched;
@@ -216,6 +224,11 @@ namespace PEDCalc
 
 		private void ToggleActive()
 		{
+			if (Configuration.Active && Configuration.FirstTimeDisable)
+			{
+				Configuration.FirstTimeDisable = false;
+				if (Tools.AskYesNo(string.Format(PluginTranslate.CheckDisable, PluginTranslate.PluginName)) == DialogResult.No) return;
+			}
 			Configuration.Active = !Configuration.Active;
 			m_menu.Image = Configuration.Active ? m_iconActive : m_iconInactive;
 			m_menu.Text = Configuration.Active ? PluginTranslate.Active : PluginTranslate.Inactive;
@@ -338,7 +351,7 @@ namespace PEDCalc
 				m = (PwEditMode)pEditMode.GetValue(m_pweForm, null);
 			else // try reading private field
 				m = (PwEditMode)Tools.GetField("m_pwEditMode", m_pweForm);
-			PluginDebug.AddSuccess("Entryform shown, editmode: ", 0, m.ToString());
+			PluginDebug.AddSuccess("Entryform shown, editmode: " + m.ToString(), 0);
 			if ((m != PwEditMode.AddNewEntry) && (m != PwEditMode.EditExistingEntry)) return;
 			CustomContextMenuStripEx ctx = (CustomContextMenuStripEx)Tools.GetField("m_ctxDefaultTimes", m_pweForm);
 			if (ctx != null)
@@ -415,25 +428,44 @@ namespace PEDCalc
 
 		private void CheckShowNewExpireDate()
 		{
-			if (m_pweForm == null) return;
+			List<string> lMsg = new List<string>();
+			if (m_pweForm == null)
+			{
+				lMsg.Add("Lost entryform");
+				return;
+			}
 			Label lNewExpireDate = (Label)Tools.GetControl("PEDCalc_NewExpireDate", m_pweForm);
-			if (lNewExpireDate == null) return;
+			if (lNewExpireDate == null)
+			{
+				lMsg.Add("Could not locate label for new expiry date");
+				return;
+			}
 			CheckBox cbExpires = (CheckBox)Tools.GetControl("m_cbExpires", m_pweForm);
 			lNewExpireDate.Visible = false;
 			PEDCalcValue ped = m_pweForm.EntryRef.GetPEDValue(true);
+			lMsg.Add("Calculated new expiry date: " + ped.ToString());
 			//No automated reculation required => Don't show calculated expiry date
 			if (ped.Off) return;
+			lMsg.Add("Expiry checkbox checked: " + (cbExpires == null ? "unknown" : cbExpires.Checked.ToString()));
 			//Entry does not expire => Don't show calculated expiry date
 			if ((cbExpires == null) || !cbExpires.Checked) return;
 			DateTimePicker dtExpireDate = (DateTimePicker)Tools.GetControl("m_dtExpireDateTime", m_pweForm);
 			//Expiry date was changed manually => Don't show calculated expiry date
+			lMsg.Add("Current expiry date: " + dtExpireDate.Value.ToString("yyyy-MM-dd HH:mm:ss.ffff K"));
+			lMsg.Add("Initial expiry date: " + m_pweForm.EntryRef.ExpiryTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss.ffff K"));
+			lMsg.Add("Entry expires: " + m_pweForm.EntryRef.Expires.ToString());
+
 			if ((dtExpireDate.Value != m_pweForm.EntryRef.ExpiryTime.ToLocalTime()) && m_pweForm.EntryRef.Expires) return;
 
 			SecureTextBoxEx password = (SecureTextBoxEx)Tools.GetControl("m_tbPassword", m_pweForm);
 			ProtectedString psOldPw = m_pweForm.EntryRef.Strings.GetSafe(PwDefs.PasswordField);
 			//Password was not changed manually => Don't show calculated expiry date
-			if ((password == null) || password.TextEx.Equals(psOldPw, false)) return;
-
+			if ((password == null) || password.TextEx.Equals(psOldPw, false))
+			{
+				lMsg.Add("Password not yet changed");
+				return;
+			}
+			lMsg.Add("Password changed");
 			lNewExpireDate.Visible = true;
 		}
 

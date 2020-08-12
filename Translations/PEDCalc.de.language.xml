@@ -65,4 +65,11 @@ Zum Ändern passe das Ablaufdatum einfach manuell an.</value>
 
 Sollen diese {2} nie ablaufenden Einträge übersprungen werden?</value>
   </item>
+    <item>
+    <key>CheckDisable</key>
+    <value>Soll {0} wirklich deaktiviert werden?
+Das Ablaufdatum eines Eintrags wird nach einer Passwortänderung nicht länger automatisch neu berechnet. 
+
+Diese Nachricht wird nur einmal angezeigt.</value>
+  </item>
 </Translation>
