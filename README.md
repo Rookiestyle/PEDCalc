@@ -47,12 +47,12 @@ C | 100 days| No | April 11th
 D | 100 days| Yes | Whatever you set manually
 
 # Translations
-PEDCalc is provided with english language built-in and allow usage of translation files.
+PEDCalc is provided with English language built-in and allow usage of translation files.
 These translation files need to be placed in a folder called *Translations* inside in your plugin folder.
-If a text is missing in the translation file, it is backfilled with the english text.
-You're welcome to add additional translation files by creating a pull request.
+If a text is missing in the translation file, it is backfilled with English text.
+You're welcome to add additional translation files by creating a pull request as described in the [wiki](https://github.com/Rookiestyle/PEDCalc/wiki/Create-or-update-translations).
 
-Naming convention for translation files: `pedcalc.<language identifier>.language.xml`\
+Naming convention for translation files: `<plugin name>.<language identifier>.language.xml`\
 Example: `pedcalc.de.language.xml`
   
 The language identifier in the filename must match the language identifier inside the KeePass language that you can select using *View -> Change language...*\
