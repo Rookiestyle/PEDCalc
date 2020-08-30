@@ -53,7 +53,7 @@ If a text is missing in the translation file, it is backfilled with English text
 You're welcome to add additional translation files by creating a pull request as described in the [wiki](https://github.com/Rookiestyle/PEDCalc/wiki/Create-or-update-translations).
 
 Naming convention for translation files: `<plugin name>.<language identifier>.language.xml`\
-Example: `pedcalc.de.language.xml`
+Example: `PEDCalc.de.language.xml`
   
 The language identifier in the filename must match the language identifier inside the KeePass language that you can select using *View -> Change language...*\
 This identifier is shown there as well, if you have [EarlyUpdateCheck](https://github.com/rookiestyle/earlyupdatecheck) installed
