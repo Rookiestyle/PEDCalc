@@ -35,6 +35,7 @@ namespace PEDCalc
 			set { Program.Config.CustomConfig.SetBool(m_ConfigFirstTimeDisable, value); }
 		}
 
+		public static readonly Version KeePassMultipleEntries = new Version(2, 46);
 	}
 
 	public sealed class PEDCalcExt : Plugin
@@ -46,14 +47,14 @@ namespace PEDCalc
 		private ToolStripMenuItem m_MainMenuEntry;
 		private ToolStripMenuItem m_MainMenuGroup;
 
-		private Image m_iconActive = null;
-		private Image m_iconInactive = null;
+		public static Image m_iconActive = null;
+		public static Image m_iconInactive = null;
 
 		private PEDCalcColumnProvider m_cp = new PEDCalcColumnProvider();
 
 		PwEntryForm m_pweForm = null;
+		private int m_iSelectedEntries = 0;
 
-		List<Delegate> lD = new List<Delegate>();
 		public override bool Initialize(IPluginHost host)
 		{
 			Terminate();
@@ -94,7 +95,7 @@ namespace PEDCalc
 
 			m_host.ColumnProviderPool.Remove(m_cp);
 
-			PEDCValueDAO.EndLogging(true);
+			PEDCValueDAO.EndLogging();
 
 			Tools.OptionsFormShown -= Tools_OptionsFormShown;
 			PwEntry.EntryTouched -= OnEntryTouched;
@@ -377,7 +378,14 @@ namespace PEDCalc
 				Label lNewExpireDate = new Label();
 				lNewExpireDate.Name = "PEDCalc_NewExpireDate";
 				string sDate = string.Empty;
-				if (dtExpireDate.Format == DateTimePickerFormat.Long)
+				m_iSelectedEntries = (int)m_host.MainWindow.GetSelectedEntriesCount();
+				if ((Tools.KeePassVersion >= Configuration.KeePassMultipleEntries) && (m_iSelectedEntries > 1))
+				{
+					PropertyInfo piMultiple = typeof(KeePass.Resources.KPRes).GetProperty("MultipleValues");
+					if (piMultiple != null) sDate = piMultiple.GetValue(null, null) as string;
+					else sDate = "?";
+				}
+				else if (dtExpireDate.Format == DateTimePickerFormat.Long)
 					sDate = expiry.ToLongDateString();
 				else if (dtExpireDate.Format == DateTimePickerFormat.Short)
 					sDate = expiry.ToShortDateString();
@@ -428,44 +436,30 @@ namespace PEDCalc
 
 		private void CheckShowNewExpireDate()
 		{
-			List<string> lMsg = new List<string>();
-			if (m_pweForm == null)
-			{
-				lMsg.Add("Lost entryform");
-				return;
-			}
+			if (m_pweForm == null) return;
+
 			Label lNewExpireDate = (Label)Tools.GetControl("PEDCalc_NewExpireDate", m_pweForm);
-			if (lNewExpireDate == null)
-			{
-				lMsg.Add("Could not locate label for new expiry date");
-				return;
-			}
-			CheckBox cbExpires = (CheckBox)Tools.GetControl("m_cbExpires", m_pweForm);
+			if (lNewExpireDate == null) return;
 			lNewExpireDate.Visible = false;
+
+			CheckBox cbExpires = (CheckBox)Tools.GetControl("m_cbExpires", m_pweForm);
 			PEDCalcValue ped = m_pweForm.EntryRef.GetPEDValue(true);
-			lMsg.Add("Calculated new expiry date: " + ped.ToString());
-			//No automated reculation required => Don't show calculated expiry date
-			if (ped.Off) return;
-			lMsg.Add("Expiry checkbox checked: " + (cbExpires == null ? "unknown" : cbExpires.Checked.ToString()));
+
+			//Automatic recalculation required?
+			if (ped.Off && (m_iSelectedEntries == 1)) return;
+
 			//Entry does not expire => Don't show calculated expiry date
 			if ((cbExpires == null) || !cbExpires.Checked) return;
-			DateTimePicker dtExpireDate = (DateTimePicker)Tools.GetControl("m_dtExpireDateTime", m_pweForm);
-			//Expiry date was changed manually => Don't show calculated expiry date
-			lMsg.Add("Current expiry date: " + dtExpireDate.Value.ToString("yyyy-MM-dd HH:mm:ss.ffff K"));
-			lMsg.Add("Initial expiry date: " + m_pweForm.EntryRef.ExpiryTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss.ffff K"));
-			lMsg.Add("Entry expires: " + m_pweForm.EntryRef.Expires.ToString());
 
+			//Check for manual change of expiry date
+			DateTimePicker dtExpireDate = (DateTimePicker)Tools.GetControl("m_dtExpireDateTime", m_pweForm);
 			if ((dtExpireDate.Value != m_pweForm.EntryRef.ExpiryTime.ToLocalTime()) && m_pweForm.EntryRef.Expires) return;
 
+			//Check for change of password
 			SecureTextBoxEx password = (SecureTextBoxEx)Tools.GetControl("m_tbPassword", m_pweForm);
 			ProtectedString psOldPw = m_pweForm.EntryRef.Strings.GetSafe(PwDefs.PasswordField);
-			//Password was not changed manually => Don't show calculated expiry date
-			if ((password == null) || password.TextEx.Equals(psOldPw, false))
-			{
-				lMsg.Add("Password not yet changed");
-				return;
-			}
-			lMsg.Add("Password changed");
+			if ((password == null) || password.TextEx.Equals(psOldPw, false)) return;
+
 			lNewExpireDate.Visible = true;
 		}
 
@@ -494,7 +488,7 @@ namespace PEDCalc
 			byte[] pw_old = m_pweForm.EntryRef.Strings.GetSafe(PwDefs.PasswordField).ReadUtf8();
 			if (MemUtil.ArraysEqual(pw_new, pw_old)) return; //password was not changed
 
-			//calculate new expiry date and writ back to form field
+			//calculate new expiry date and write back to form field
 			if (expiryDate.Value.Kind == DateTimeKind.Local)
 				expiryDate.Value = days.NewExpiryDateUtc.ToLocalTime();
 			else

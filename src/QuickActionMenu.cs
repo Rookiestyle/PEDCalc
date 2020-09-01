@@ -42,22 +42,26 @@ namespace PEDCalc
 			DropDown = new ToolStripDropDown();
 			DropDown.LayoutStyle = ToolStripLayoutStyle.Table;
 			var settings = DropDown.LayoutSettings as TableLayoutSettings;
-			settings.ColumnCount = 3;
+			settings.ColumnCount = 4;
 
+			DropDown.Items.Add(GetImage(true));
 			ToolStripMenuItem tsmiQuickAction = CreateMenuItem(PluginTranslate.OptionsInactive, new PEDCalcValue(PEDC.Off));
 			DropDown.Items.Add(tsmiQuickAction);
 			settings.SetColumnSpan(tsmiQuickAction, 3);
 
+			DropDown.Items.Add(GetImage(true));
 			tsmiQuickAction = CreateMenuItem(PluginTranslate.OptionsInherit, new PEDCalcValue(PEDC.Inherit));
 			DropDown.Items.Add(tsmiQuickAction);
 			settings.SetColumnSpan(tsmiQuickAction, 3);
 
+			DropDown.Items.Add(GetImage(false));
 			tsmiQuickAction = CreateMenuItem(PluginTranslate.OptionsExpire, new PEDCalcValue(PEDC.SetExpired));
 			DropDown.Items.Add(tsmiQuickAction);
 			settings.SetColumnSpan(tsmiQuickAction, 3);
 
 			if (!bHideDisableExpiryAction)
 			{
+				DropDown.Items.Add(GetImage(false));
 				tsmiQuickAction = CreateMenuItem(KeePass.Resources.KPRes.NeverExpires, new PEDCalcValue(PEDC.SetNeverExpires));
 				DropDown.Items.Add(tsmiQuickAction);
 				settings.SetColumnSpan(tsmiQuickAction, 3);
@@ -90,11 +94,20 @@ namespace PEDCalc
 
 			DropDown.Padding = new Padding(5, DropDown.Padding.Top, 5, DropDown.Padding.Bottom);
 
+			DropDown.Items.Add(GetImage(true));
 			DropDown.Items.Add(m_tbValue);
 			DropDown.Items.Add(m_cbUnit);
 			DropDown.Items.Add(m_b);
 
 			DropDown.Tag = this;
+		}
+
+		private ToolStripMenuItem GetImage(bool bHasImage)
+		{
+			return new ToolStripMenuItem()
+			{
+				Image = bHasImage ? PEDCalcExt.m_iconInactive : null,
+			};
 		}
 
 		private ToolStripMenuItem CreateMenuItem(string sText, PEDCalcValue pcv)
@@ -157,16 +170,18 @@ namespace PEDCalc
 			FontStyle fs = DropDown.Items[0].Font.Style & ~FontStyle.Bold;
 			Font f = new Font(DropDown.Items[0].Font, fs);
 			Font fActive = new Font(DropDown.Items[0].Font, fs | FontStyle.Bold);
-			DropDown.Items[0].Font = pcv.Off ? fActive : f;
-			DropDown.Items[1].Font = pcv.Inherit ? fActive : f;
+			DropDown.Items[1].Font = pcv.Off ? fActive : f;
+			DropDown.Items[3].Font = pcv.Inherit ? fActive : f;
 
 			if (KeePassLib.Native.NativeLib.IsUnix()) //Mono does not support changing the fontstyle
 			{
-				DropDown.Items[0].Text = DropDown.Items[0].Text.Replace("-> ", "");
-				DropDown.Items[1].Text = DropDown.Items[1].Text.Replace("-> ", "");
-				if (pcv.Off) DropDown.Items[0].Text = "-> " + DropDown.Items[0].Text;
-				if (pcv.Inherit) DropDown.Items[1].Text = "-> " + DropDown.Items[1].Text;
+				DropDown.Items[0].Text = DropDown.Items[1].Text.Replace("-> ", "");
+				DropDown.Items[1].Text = DropDown.Items[3].Text.Replace("-> ", "");
+				if (pcv.Off) DropDown.Items[1].Text = "-> " + DropDown.Items[1].Text;
+				if (pcv.Inherit) DropDown.Items[3].Text = "-> " + DropDown.Items[3].Text;
 			}
+			DropDown.Items[0].Image = pcv.Off ? PEDCalcExt.m_iconActive : PEDCalcExt.m_iconInactive;
+			DropDown.Items[2].Image = pcv.Inherit ? PEDCalcExt.m_iconActive : PEDCalcExt.m_iconInactive;
 
 			if (pcv.Specific)
 			{
@@ -182,11 +197,14 @@ namespace PEDCalc
 					m_tbValue.Text = KeePass.Program.Config.Defaults.NewEntryExpiresInDays.ToString();
 				m_cbUnit.SelectedIndex = 0;
 			}
+
+			DropDown.Items[DropDown.Items.Count - 4].Image = !pcv.Off && !pcv.Inherit ? PEDCalcExt.m_iconActive : PEDCalcExt.m_iconInactive;
+			m_b.CheckState = !pcv.Off && !pcv.Inherit ? CheckState.Checked : CheckState.Unchecked;
 		}
 
 		internal void SetInheritValue(PEDCalcValue pcvInherit)
 		{
-			DropDown.Items[1].Text = string.Format(PluginTranslate.OptionsInherit, pcvInherit.ToString(true));
+			DropDown.Items[3].Text = string.Format(PluginTranslate.OptionsInherit, pcvInherit.ToString(true));
 		}
 	}
 }

@@ -21,19 +21,20 @@ namespace PEDCalc
 
 	public class PEDCalcValue
 	{
+		private static char[] m_Sep = new char[1] { ' ' };
 		public static DateTime UnixStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Local);
 		private int m_value = 30;
 		public int value
 		{
 			get { return m_value; }
-			set { SetValue(m_unit, value, true); }
+			set { SetValue(m_unit, value, true, false); }
 		}
 
 		private PEDC m_unit = PEDC.Inherit;
 		public PEDC unit
 		{
 			get { return m_unit; }
-			set { SetValue(value, m_value, false); }
+			set { SetValue(value, m_value, false, false); }
 		}
 		public DateTime NewExpiryDateUtc { get; private set; }
 
@@ -44,7 +45,7 @@ namespace PEDCalc
 		public PEDCalcValue(PEDC unit)
 		{
 			m_unit = unit;
-			SetValue(m_unit, m_value, false);
+			SetValue(m_unit, m_value, false, false);
 		}
 
 		public PEDCalcValue(PEDC unit, int value)
@@ -81,11 +82,13 @@ namespace PEDCalc
 		{
 			PEDCalcValue result = new PEDCalcValue(PEDC.Inherit);
 			if (string.IsNullOrEmpty(stringValue)) return result;
-			string[] s = stringValue.Split(new char[] { ' ' });
+			string[] s = stringValue.Split(m_Sep);
 			int val = 0;
 			if (s.Count() < 1) return result;
 			if (!int.TryParse(s[0], out val))
 			{
+				//Ok, it's nothing like '5 days'
+				//So it better is one of the defined values for enum PEDC
 				try
 				{
 					PEDC unit = (PEDC)Enum.Parse(typeof(PEDC), s[0], true);
@@ -102,11 +105,6 @@ namespace PEDCalc
 			}
 			catch { }
 			return result;
-		}
-
-		private void SetValue(PEDC newUnit, int newValue, bool ValueChanged)
-		{
-			SetValue(newUnit, newValue, ValueChanged, false);
 		}
 
 		private void SetValue(PEDC newUnit, int newValue, bool ValueChanged, bool Force)
@@ -164,8 +162,7 @@ namespace PEDCalc
 
 		public static bool operator ==(PEDCalcValue p1, PEDCalcValue p2)
 		{
-			if (ReferenceEquals(p1, null))
-				return ReferenceEquals(p2, null);
+			if (ReferenceEquals(p1, null)) return ReferenceEquals(p2, null);
 			return p1.Equals(p2);
 		}
 
@@ -187,37 +184,45 @@ namespace PEDCalc
 			internal PEDCalcValue value;
 			internal PEDCalcValue valueinherit;
 		}
-		private static Dictionary<PwEntry, string> m_dPEDValuesString = new Dictionary<PwEntry, string>();
+
+		//Use PwEntry instead of PwUuid
+		//Using PwEntry sometimes is buggy, e. g. when changing an entry in PwEntryForm but not saving the changes
+		//When checking for updates, search by PwUuid
+		//PwEntry required to invalidate groups (all entries within this group)
 		private static Dictionary<PwEntry, PEDCValueEntry> m_dPEDValues = new Dictionary<PwEntry, PEDCValueEntry>();
+		//Use PwUuid
+		private static Dictionary<PwUuid, string> m_dPEDValuesString = new Dictionary<PwUuid, string>();
 
 		public static void StartLogging()
 		{
-			PwGroup.GroupTouched += OnGroupTouched;
-			PwEntry.EntryTouched += OnEntryTouched;
+			PwGroup.GroupTouched += OnObjectTouched;
+			PwEntry.EntryTouched += OnObjectTouched;
 		}
 
-		public static void EndLogging(bool bClear)
+		public static void EndLogging()
 		{
-			PwGroup.GroupTouched -= OnGroupTouched;
-			PwEntry.EntryTouched -= OnEntryTouched;
+			PwGroup.GroupTouched -= OnObjectTouched;
+			PwEntry.EntryTouched -= OnObjectTouched;
 
-			if (!bClear) return;
 			m_dPEDValuesString.Clear();
 			m_dPEDValues.Clear();
 		}
 
 		public static void Invalidate(PwEntry pe)
 		{
+			m_dPEDValuesString.Remove(pe.Uuid);
 			m_dPEDValues.Remove(pe);
-			m_dPEDValuesString.Remove(pe);
+			return;
+			List<PwEntry> lRemove = m_dPEDValues.Keys.ToList().FindAll(x => x.Uuid.Equals(pe.Uuid));
+			if (lRemove == null) return;
+			foreach (PwEntry peRemove in lRemove) m_dPEDValues.Remove(peRemove);
 		}
 
 		public static void Invalidate(PwGroup pg)
 		{
-			List<PwEntry> lRemove = m_dPEDValuesString.Keys.ToList();
+			List<PwEntry> lRemove = m_dPEDValues.Keys.ToList();
 			lRemove.RemoveAll(x => !x.IsContainedIn(pg));
-			foreach (PwEntry pe in lRemove)
-				Invalidate(pe);
+			foreach (PwEntry pe in lRemove)	Invalidate(pe);
 		}
 
 		public static PEDCalcValue GetPEDCValue(PwEntry pe, bool recursion)
@@ -244,37 +249,26 @@ namespace PEDCalc
 
 		public static string GetPEDCValueString(PwEntry pe)
 		{
-			if (!m_dPEDValuesString.ContainsKey(pe))
+			if (!m_dPEDValuesString.ContainsKey(pe.Uuid))
 			{
 				PEDCalcValue pcv_entry = pe.GetPEDValue(false);
 				bool bInherit = pcv_entry.Inherit;
 				if (bInherit) pcv_entry = pe.GetPEDValue(true);
 				string sUnit = pcv_entry.ToString(true);
-				m_dPEDValuesString[pe] = sUnit + (bInherit ? "*" : string.Empty);
+				m_dPEDValuesString[pe.Uuid] = sUnit + (bInherit ? "*" : string.Empty);
 				PluginDebug.AddInfo("Add PEDCValue-string to buffer", 0,
 					"Entry: " + pe.Uuid.ToHexString() + " / " + pe.Strings.ReadSafe(PwDefs.TitleField),
-					"Value: " + m_dPEDValuesString[pe]);
+					"Value: " + m_dPEDValuesString[pe.Uuid]);
 			}
-			return m_dPEDValuesString[pe];
+			return m_dPEDValuesString[pe.Uuid];
 		}
 
-		private static void OnEntryTouched(object sender, ObjectTouchedEventArgs e)
+		private static void OnObjectTouched(object sender, ObjectTouchedEventArgs e)
 		{
 			// !e.Modified = Entry was not modified => nothing to do
 			if (!e.Modified) return;
-			PwEntry pe = e.Object as PwEntry;
-			if (pe == null) return;
-			Invalidate(pe);
-		}
-
-		private static void OnGroupTouched(object sender, ObjectTouchedEventArgs e)
-		{
-			// !e.Modified = Group was not modified => nothing to do
-			// e.ParentsTouched => Be lazy and assume no PEDCValue was changed (we don't touch parents)
-			if (!e.Modified || e.ParentsTouched) return;
-			PwGroup pg = e.Object as PwGroup;
-			if (pg == null) return;
-			Invalidate(pg);
+			if (e.Object is PwEntry) Invalidate(e.Object as PwEntry);
+			if (e.Object is PwGroup) Invalidate(e.Object as PwGroup);
 		}
 	}
 }
