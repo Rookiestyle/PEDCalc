@@ -44,6 +44,7 @@ namespace PluginTranslation
 		public static readonly string UnitWeeks = @"weeks";
 		public static readonly string UnitMonths = @"months";
 		public static readonly string UnitYears = @"years";
+		public static readonly string UnitHours = @"hours";
 		public static readonly string InheritInherit = @"inherit";
 		public static readonly string ErrorInitExpiryDate = @"Could not set expiry date to {0}";
 		public static readonly string NewExpiryDateTooltip = @"This is the pre-calculated expiration date.

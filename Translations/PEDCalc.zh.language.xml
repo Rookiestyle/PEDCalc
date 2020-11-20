@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Translation>
-  <TranslationVersion>2</TranslationVersion>
+  <TranslationVersion>3</TranslationVersion>
   <item>
     <key>Active</key>
     <value>PEDCalc已激活</value>
@@ -44,6 +44,10 @@
   <item>
     <key>UnitYears</key>
     <value>年</value>
+  </item>
+  <item>
+    <key>UnitHours</key>
+    <value>小时</value>
   </item>
   <item>
     <key>InheritInherit</key>

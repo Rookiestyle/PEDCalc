@@ -15,6 +15,7 @@ namespace PEDCalc
 		Weeks,
 		Months,
 		Years,
+		Hours,
 		SetExpired,
 		SetNeverExpires,
 	}
@@ -42,6 +43,24 @@ namespace PEDCalc
 		public bool Off { get { return m_unit == PEDC.Off; } }
 		public bool Specific { get { return !Inherit && !Off; } }
 
+		static PEDCalcValue()
+		{
+			SetTranslatedUnits();
+		}
+
+		public static void SetTranslatedUnits()
+		{
+			var PEDCItems = Enum.GetValues(typeof(PEDC)).Cast<PEDC>();
+			foreach (var i in PEDCItems)
+			{
+				if (i == PEDC.Inherit || i == PEDC.Off || i == PEDC.SetExpired || i == PEDC.SetNeverExpires) continue;
+				string sName = i.ToString();
+				System.Reflection.FieldInfo fiString = typeof(PluginTranslate).GetField("Unit" + sName, System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+				if (fiString != null) sName = fiString.GetValue(null) as string;
+				m_dTranslatedUnits[i] = sName;
+			}
+		}
+
 		public PEDCalcValue(PEDC unit)
 		{
 			m_unit = unit;
@@ -67,15 +86,24 @@ namespace PEDCalc
 			string sUnit = string.Empty;
 			switch (unit)
 			{
-				case PEDC.Days: sUnit = PluginTranslate.UnitDays; break;
-				case PEDC.Weeks: sUnit = PluginTranslate.UnitWeeks; break;
-				case PEDC.Months: sUnit = PluginTranslate.UnitMonths; break;
-				case PEDC.Years: sUnit = PluginTranslate.UnitYears; break;
+				case PEDC.SetExpired:
+				case PEDC.SetNeverExpires: break;
 				case PEDC.Off: sUnit = PluginTranslate.OptionsInactive; break;
 				case PEDC.Inherit: sUnit = PluginTranslate.InheritInherit; break;
+				default: sUnit = GetTranslatedUnit(unit); break;
 			}
 			if (!Specific) return sUnit;
 			return string.Format("{0} {1}", value, sUnit);
+		}
+
+		private static Dictionary<PEDC, string> m_dTranslatedUnits = new Dictionary<PEDC, string>();
+		public static string GetTranslatedUnit(PEDC unit)
+		{
+			string sTranslated = string.Empty;
+			if (m_dTranslatedUnits.TryGetValue(unit, out sTranslated)) return sTranslated;
+			sTranslated = unit.ToString();
+			m_dTranslatedUnits[unit] = sTranslated;
+			return sTranslated;
 		}
 
 		public static PEDCalcValue ConvertFromString(string stringValue)
@@ -123,6 +151,11 @@ namespace PEDCalc
 				return;
 			}
 			double days = ConvertToDays();
+			if (m_unit == PEDC.Hours)
+			{
+				NewExpiryDateUtc = DateTime.Now.AddHours(days).ToUniversalTime();
+				return;
+			}
 			NewExpiryDateUtc = DateTime.Now.AddDays(days + 1);
 			NewExpiryDateUtc = NewExpiryDateUtc.Date;
 			TimeSpan x = new TimeSpan(0, 0, 1);
@@ -140,6 +173,8 @@ namespace PEDCalc
 				return (DateTime.Now.AddMonths(value) - DateTime.Now).TotalDays;
 			if (unit == PEDC.Years)
 				return (DateTime.Now.AddYears(value) - DateTime.Now).TotalDays;
+			if (unit == PEDC.Hours)
+				return value; //Do not convert to hours
 			return 0;
 		}
 

@@ -81,7 +81,12 @@ namespace PEDCalc
 			m_cbUnit.Padding = Padding.Empty;
 			m_cbUnit.Margin = new Padding(0, 0, 5, 0);
 			m_cbUnit.KeyDown += OnKeyDown;
-			m_cbUnit.Items.AddRange(new string[] { PluginTranslate.UnitDays, PluginTranslate.UnitWeeks, PluginTranslate.UnitMonths, PluginTranslate.UnitYears });
+			var PEDCItems = Enum.GetValues(typeof(PEDC)).Cast<PEDC>();
+			foreach (var i in PEDCItems)
+			{
+				if (i == PEDC.Inherit || i == PEDC.Off || i == PEDC.SetExpired || i == PEDC.SetNeverExpires) continue;
+				m_cbUnit.Items.Add(new PEDCListItem(i));
+			}
 			m_cbUnit.DropDownStyle = ComboBoxStyle.DropDownList;
 
 			m_b.Click += OnButtonClick;
@@ -144,9 +149,8 @@ namespace PEDCalc
 			{
 				PEDCalcValue pcv;
 				PEDC unit = PEDC.Days;
-				if (m_cbUnit.SelectedIndex == 1) unit = PEDC.Weeks;
-				if (m_cbUnit.SelectedIndex == 2) unit = PEDC.Months;
-				if (m_cbUnit.SelectedIndex == 3) unit = PEDC.Years;
+				PEDCListItem i = m_cbUnit.Items[m_cbUnit.SelectedIndex] as PEDCListItem;
+				unit = i.Unit;
 				int dummy = -1;
 				if (!int.TryParse(m_tbValue.Text, out dummy) || (dummy == -1))
 				{
@@ -186,10 +190,15 @@ namespace PEDCalc
 			if (pcv.Specific)
 			{
 				m_tbValue.Text = pcv.value.ToString();
-				if (pcv.unit == PEDC.Days) m_cbUnit.SelectedIndex = 0;
-				if (pcv.unit == PEDC.Weeks) m_cbUnit.SelectedIndex = 1;
-				if (pcv.unit == PEDC.Months) m_cbUnit.SelectedIndex = 2;
-				if (pcv.unit == PEDC.Years) m_cbUnit.SelectedIndex = 3;
+				for (int i = 0; i < m_cbUnit.Items.Count; i++)
+				{
+					PEDCListItem pli = m_cbUnit.Items[i] as PEDCListItem;
+					if (pli != null && pli.Unit == pcv.unit)
+					{
+						m_cbUnit.SelectedIndex = i;
+						break;
+					}
+				}
 			}
 			else
 			{
@@ -205,6 +214,21 @@ namespace PEDCalc
 		internal void SetInheritValue(PEDCalcValue pcvInherit)
 		{
 			DropDown.Items[3].Text = string.Format(PluginTranslate.OptionsInherit, pcvInherit.ToString(true));
+		}
+
+		private class PEDCListItem
+		{
+			internal PEDC Unit;
+
+			internal PEDCListItem(PEDC pedc)
+			{
+				Unit = pedc;
+			}
+
+			public override string ToString()
+			{
+				return PEDCalcValue.GetTranslatedUnit(Unit);
+			}
 		}
 	}
 }

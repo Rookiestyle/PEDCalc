@@ -63,6 +63,7 @@ namespace PEDCalc
 				return false;
 			m_host = host;
 			PluginTranslate.Init(this, KeePass.Program.Translation.Properties.Iso6391Code);
+			PluginTranslate.TranslationChanged += (o, e) => { PEDCalcValue.SetTranslatedUnits(); };
 			Tools.DefaultCaption = PluginTranslate.PluginName;
 			Tools.PluginURL = "https://github.com/rookiestyle/pedcalc/";
 

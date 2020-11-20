@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Translation>
-  <TranslationVersion>5</TranslationVersion>
+  <TranslationVersion>6</TranslationVersion>
   <item>
     <key>Active</key>
     <value>PEDCalc ist aktiv</value>
@@ -44,6 +44,10 @@
   <item>
     <key>UnitYears</key>
     <value>Jahre</value>
+  </item>
+  <item>
+    <key>UnitHours</key>
+    <value>Stunden</value>
   </item>
   <item>
     <key>InheritInherit</key>

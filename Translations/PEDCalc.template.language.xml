@@ -46,6 +46,10 @@
     <value>years</value>
   </item>
   <item>
+    <key>UnitHours</key>
+    <value>hours</value>
+  </item>
+  <item>
     <key>InheritInherit</key>
     <value>inherit</value>
   </item>
