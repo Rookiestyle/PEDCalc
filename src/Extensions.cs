@@ -31,7 +31,7 @@ namespace PEDCalc
 			if (days.NewExpiryDateUtc == pe.ExpiryTime) return;
 			pe.ExpiryTime = days.NewExpiryDateUtc;
 			pe.Touch(true, false);
-			KeePass.Program.MainForm.UpdateUI(false, null, false, null, true, null, true);
+			Tools.RefreshEntriesList(true);
 		}
 
 		internal static bool RecalcRequired(this PwEntry pe)

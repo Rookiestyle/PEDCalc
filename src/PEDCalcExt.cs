@@ -278,7 +278,7 @@ namespace PEDCalc
 						pg.RecalcExpiry();
 					pg.Touch(true, false);
 				}
-				Program.MainForm.UpdateUI(false, null, true, null, true, null, true);
+				Tools.RefreshEntriesList(true);
 			}
 			else if (bEntry)
 			{
@@ -310,7 +310,7 @@ namespace PEDCalc
 						entry.Touch(true, false);
 					}
 				}
-				Program.MainForm.UpdateUI(false, null, false, null, true, null, true);
+				Tools.RefreshEntriesList(true);
 			}
 		}
 
