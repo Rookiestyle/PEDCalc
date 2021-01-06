@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Translation>
+  <TranslationVersion>0</TranslationVersion>
+  <item>
+    <key>Active</key>
+    <value>PEDCalc está ativo</value>
+  </item>
+  <item>
+    <key>Inactive</key>
+    <value>PEDCalc está inativo</value>
+  </item>
+  <item>
+    <key>AskRecalcAll</key>
+    <value>Recalcular a data de validade de todas as entradas afetadas?</value>
+  </item>
+  <item>
+    <key>AskRecalcSingle</key>
+    <value>Recalcular a data de validade?</value>
+  </item>
+  <item>
+    <key>OptionsInactive</key>
+    <value>Inativo</value>
+  </item>
+  <item>
+    <key>OptionsInherit</key>
+    <value>Herdar: {0}</value>
+  </item>
+  <item>
+    <key>OptionsExpire</key>
+    <value>Expirar entradas</value>
+  </item>
+  <item>
+    <key>UnitDays</key>
+    <value>dias</value>
+  </item>
+  <item>
+    <key>UnitWeeks</key>
+    <value>semanas</value>
+  </item>
+  <item>
+    <key>UnitMonths</key>
+    <value>meses</value>
+  </item>
+  <item>
+    <key>UnitYears</key>
+    <value>anos</value>
+  </item>
+  <item>
+    <key>UnitHours</key>
+    <value>horas</value>
+  </item>
+  <item>
+    <key>InheritInherit</key>
+    <value>herdar</value>
+  </item>
+  <item>
+    <key>ErrorInitExpiryDate</key>
+    <value>Não foi possível definir a data de expiração para {0}</value>
+  </item>
+  <item>
+    <key>NewExpiryDateTooltip</key>
+    <value>Esta é a data de vencimento pré-calculada.
+Ele será definido automaticamente se você alterar a senha da entrada.
+
+Para substituir, basta alterar a data de validade manualmente.</value>
+  </item>
+  <item>
+    <key>ExpireAllEntriesQuestion</key>
+    <value>{0} pode afetar até {1} entradas no total, {2} dessas {1} nunca irão expirar a partir de agora.
+
+Pular essas {2} entradas que nunca expiram?</value>
+  </item>
+  <item>
+    <key>CheckDisable</key>
+    <value>Tem certeza que deseja desativar {0}?
+A data de expiração de uma entrada não será mais recalculada quando você alterar a senha.
+
+Esta mensagem será exibida apenas uma vez.</value>
+  </item>
+</Translation>
