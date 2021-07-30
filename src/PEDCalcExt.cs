@@ -3,6 +3,7 @@ using KeePass.Forms;
 using KeePass.Plugins;
 using KeePass.UI;
 using KeePassLib;
+using KeePassLib.Collections;
 using KeePassLib.Security;
 using KeePassLib.Utility;
 using PluginTools;
@@ -19,7 +20,6 @@ namespace PEDCalc
 	public static class Configuration
 	{
 		private static string m_ConfigActive = "PEDCalc.active";
-		public static readonly string DaysField = "PEDCalc.days"; //was used in previous versions which supported days only
 		public static readonly string Interval = "PEDCalc.interval"; //new fieldname as meanwhile days, weeks, months and years are supported
 		public static bool Active
 		{
@@ -77,11 +77,18 @@ namespace PEDCalc
 
 			PEDCValueDAO.StartLogging();
 
+			m_host.MainWindow.FileOpened += DoMigrate;
+
 			m_host.ColumnProviderPool.Add(m_cp);
 
 			AddMenu();
 
 			return true;
+		}
+
+		private void DoMigrate(object sender, FileOpenedEventArgs e)
+		{
+			DataMigration.CheckAndMigrate(e.Database);
 		}
 
 		private void Tools_OptionsFormShown(object sender, Tools.OptionsFormsEventArgs e)
@@ -153,6 +160,7 @@ namespace PEDCalc
 		private ToolStripMenuItem CreatePEDMenu(bool bGroup, bool bInEntryForm)
 		{
 			ToolStripMenuItem tsmi = new ToolStripMenuItem(PluginTranslate.PluginName + "...");
+			tsmi.Name = "PEDCALC_EntryForm_ContextMenu";
 			tsmi.Image = SmallIcon;
 			tsmi.DropDownOpening += OnPEDMenuOpening;
 			PEDValue_QuickAction qa = new PEDValue_QuickAction(bGroup);
@@ -216,8 +224,10 @@ namespace PEDCalc
 			else if (m_pweForm != null)
 			{
 				PwEntry pe = m_pweForm.EntryRef;
-				m_pweForm.UpdateEntryStrings(true, true);
-				PEDCalcValue currentValue = m_pweForm.EntryStrings.ReadPEDCString();
+				StringDictionaryEx dCustomData = (StringDictionaryEx)Tools.GetField("m_sdCustomData", m_pweForm);
+				PEDCalcValue currentValue;
+				if (dCustomData != null) currentValue = PEDCalcValue.ConvertFromString(dCustomData.Get(Configuration.Interval));
+				else currentValue = PEDCalcValue.ConvertFromString(pe.ReadPEDCString());
 				if (currentValue == null) currentValue = pe.GetPEDValue(false);
 				pqaActions.SetInheritValue(pe.GetPEDValueInherit());
 				pqaActions.SetValue(currentValue);
@@ -339,29 +349,39 @@ namespace PEDCalc
 		{
 			if (!Configuration.Active) return;
 			if (!(e.Form is PwEntryForm)) return;
-			m_pweForm = (PwEntryForm)e.Form;
-			m_pweForm.Shown += OnFormShown;
-			m_pweForm.FormClosed += OnFormClosed;
-			m_pweForm.EntrySaving += OnEntrySaving;
+
+			//Don't set m_pweForm now
+			//User might open an older version and m_pweForm will be overwritten by that
+			//Also other plugins might open a 2nd PwEntryForm (you never know...)
+			e.Form.Shown += OnFormShown;
 		}
 
 		private void OnFormShown(object sender, EventArgs e)
 		{
 			PwEditMode m = PwEditMode.Invalid;
+			(sender as Form).Activated -= OnFormShown;
 			PropertyInfo pEditMode = typeof(PwEntryForm).GetProperty("EditModeEx");
 			if (pEditMode != null) //will work starting with KeePass 2.41, preferred way as it's a public attribute
-				m = (PwEditMode)pEditMode.GetValue(m_pweForm, null);
+				m = (PwEditMode)pEditMode.GetValue(sender, null);
 			else // try reading private field
-				m = (PwEditMode)Tools.GetField("m_pwEditMode", m_pweForm);
+				m = (PwEditMode)Tools.GetField("m_pwEditMode", sender);
 			PluginDebug.AddSuccess("Entryform shown, editmode: " + m.ToString(), 0);
 			if ((m != PwEditMode.AddNewEntry) && (m != PwEditMode.EditExistingEntry)) return;
+			m_pweForm = sender as PwEntryForm;
+			m_pweForm.Activated += OnFormShown;
+			m_pweForm.FormClosed += OnFormClosed;
+			m_pweForm.EntrySaving += OnEntrySaving;
 			CustomContextMenuStripEx ctx = (CustomContextMenuStripEx)Tools.GetField("m_ctxDefaultTimes", m_pweForm);
 			if (ctx != null)
 			{
-				ctx.Items.Add(new ToolStripSeparator());
-				ToolStripMenuItem tsmiPED = CreatePEDMenu(false, true);
-				ctx.Items.Add(tsmiPED);
-				PluginDebug.AddSuccess("Found m_ctxDefaultTimes", 0);
+				if (ctx.Enabled && !ctx.Items.ContainsKey("PEDCALC_EntryForm_ContextMenu"))
+				{
+
+					ctx.Items.Add(new ToolStripSeparator());
+					ToolStripMenuItem tsmiPED = CreatePEDMenu(false, true);
+					ctx.Items.Add(tsmiPED);
+					PluginDebug.AddSuccess("Found m_ctxDefaultTimes", 0);
+				}
 			}
 			else
 				PluginDebug.AddError("Could not find m_ctxDefaultTimes", 0);
@@ -501,12 +521,45 @@ namespace PEDCalc
 			ToolStripDropDown tsdd = (sender as PEDValue_QuickAction).DropDown;
 			if (tsdd == null) return;
 
-			m_pweForm.EntryStrings.Remove(Configuration.DaysField);
-			if (e.Value.Inherit)
-				m_pweForm.EntryStrings.Remove(Configuration.Interval);
-			else if (e.Value.unit != PEDC.SetExpired)
-				m_pweForm.EntryStrings.Set(Configuration.Interval, new ProtectedString(false, e.Value.ToString()));
-			m_pweForm.UpdateEntryStrings(false, true);
+			StringDictionaryEx dCustomData = null;
+			dCustomData = (StringDictionaryEx)Tools.GetField("m_sdCustomData", m_pweForm);
+			ListView lvCustomData = (ListView)Tools.GetControl("m_lvCustomData", m_pweForm);
+			if (dCustomData != null)
+			{
+				if (e.Value.Inherit)
+				{
+					dCustomData.Remove(Configuration.Interval);
+					if (lvCustomData != null)
+					{
+						for (int i = 0; i < lvCustomData.Items.Count; i++)
+						{
+							if (lvCustomData.Items[i].Text == Configuration.Interval)
+							{
+								lvCustomData.Items.RemoveAt(i);
+								break;
+							}
+						}
+					}
+				}
+				else if (e.Value.unit != PEDC.SetExpired)
+				{
+					dCustomData.Set(Configuration.Interval, e.Value.ToString());
+					if (lvCustomData != null)
+					{
+						for (int i = 0; i < lvCustomData.Items.Count; i++)
+						{
+							if (lvCustomData.Items[i].Text == Configuration.Interval)
+							{
+								lvCustomData.Items.RemoveAt(i);
+								break;
+							}
+						}
+						ListViewItem li = lvCustomData.Items.Add(Configuration.Interval);
+						li.SubItems.Add(Configuration.Interval);
+						li.SubItems[1].Text = e.Value.ToString();
+					}
+				}
+			}
 			if (e.Value.Off) return;
 			ExpiryControlGroup ecg = (ExpiryControlGroup)Tools.GetField("m_cgExpiry", m_pweForm);
 			PEDCalcValue pcv = e.Value;
