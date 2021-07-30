@@ -160,6 +160,7 @@ namespace PEDCalc
 		private ToolStripMenuItem CreatePEDMenu(bool bGroup, bool bInEntryForm)
 		{
 			ToolStripMenuItem tsmi = new ToolStripMenuItem(PluginTranslate.PluginName + "...");
+			tsmi.Name = "PEDCALC_EntryForm_ContextMenu";
 			tsmi.Image = SmallIcon;
 			tsmi.DropDownOpening += OnPEDMenuOpening;
 			PEDValue_QuickAction qa = new PEDValue_QuickAction(bGroup);
@@ -348,29 +349,39 @@ namespace PEDCalc
 		{
 			if (!Configuration.Active) return;
 			if (!(e.Form is PwEntryForm)) return;
-			m_pweForm = (PwEntryForm)e.Form;
-			m_pweForm.Shown += OnFormShown;
-			m_pweForm.FormClosed += OnFormClosed;
-			m_pweForm.EntrySaving += OnEntrySaving;
+
+			//Don't set m_pweForm now
+			//User might open an older version and m_pweForm will be overwritten by that
+			//Also other plugins might open a 2nd PwEntryForm (you never know...)
+			e.Form.Shown += OnFormShown;
 		}
 
 		private void OnFormShown(object sender, EventArgs e)
 		{
 			PwEditMode m = PwEditMode.Invalid;
+			(sender as Form).Activated -= OnFormShown;
 			PropertyInfo pEditMode = typeof(PwEntryForm).GetProperty("EditModeEx");
 			if (pEditMode != null) //will work starting with KeePass 2.41, preferred way as it's a public attribute
-				m = (PwEditMode)pEditMode.GetValue(m_pweForm, null);
+				m = (PwEditMode)pEditMode.GetValue(sender, null);
 			else // try reading private field
-				m = (PwEditMode)Tools.GetField("m_pwEditMode", m_pweForm);
+				m = (PwEditMode)Tools.GetField("m_pwEditMode", sender);
 			PluginDebug.AddSuccess("Entryform shown, editmode: " + m.ToString(), 0);
 			if ((m != PwEditMode.AddNewEntry) && (m != PwEditMode.EditExistingEntry)) return;
+			m_pweForm = sender as PwEntryForm;
+			m_pweForm.Activated += OnFormShown;
+			m_pweForm.FormClosed += OnFormClosed;
+			m_pweForm.EntrySaving += OnEntrySaving;
 			CustomContextMenuStripEx ctx = (CustomContextMenuStripEx)Tools.GetField("m_ctxDefaultTimes", m_pweForm);
 			if (ctx != null)
 			{
-				ctx.Items.Add(new ToolStripSeparator());
-				ToolStripMenuItem tsmiPED = CreatePEDMenu(false, true);
-				ctx.Items.Add(tsmiPED);
-				PluginDebug.AddSuccess("Found m_ctxDefaultTimes", 0);
+				if (ctx.Enabled && !ctx.Items.ContainsKey("PEDCALC_EntryForm_ContextMenu"))
+				{
+
+					ctx.Items.Add(new ToolStripSeparator());
+					ToolStripMenuItem tsmiPED = CreatePEDMenu(false, true);
+					ctx.Items.Add(tsmiPED);
+					PluginDebug.AddSuccess("Found m_ctxDefaultTimes", 0);
+				}
 			}
 			else
 				PluginDebug.AddError("Could not find m_ctxDefaultTimes", 0);
