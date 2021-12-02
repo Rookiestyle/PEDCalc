@@ -14,7 +14,8 @@ PEDCalc let's you define a *lifetime* (validity period) for passwords and will a
 - [Configuration](#configuration)
 - [Usage](#usage)
 - [Translations](#translations)
-- [Download and Requirements](#download-and-requirements)
+- [Download & updates](#download--updates)
+- [Requirements](#requirements)
 
 # Configuration
 There is no complex configuration, PEDCalc is designed to *simply work*.  
@@ -58,13 +59,16 @@ Example: `PEDCalc.de.language.xml`
 The language identifier in the filename must match the language identifier inside the KeePass language that you can select using *View -> Change language...*\
 This identifier is shown there as well, if you have [EarlyUpdateCheck](https://github.com/rookiestyle/earlyupdatecheck) installed
 
-# Download and Requirements
+# Download & updates
 ## Download
 Please follow these links to download the plugin file itself.
 - [Download newest release](https://github.com/rookiestyle/pedcalc/releases/latest/download/PEDCalc.plgx)
 - [Download history](https://github.com/rookiestyle/pedcalc/releases)
 
 If you're interested in any of the available translations in addition, please download them from the [Translations](Translations) folder.
-## Requirements
+
+In addition to the manual way of downloading the plugin, you can use [EarlyUpdateCheck](https://github.com/rookiestyle/earlyupdatecheck/) to update both the plugin and its translations automatically.  
+See the [one click plugin update wiki](https://github.com/Rookiestyle/EarlyUpdateCheck/wiki/One-click-plugin-update) for more details.
+# Requirements
 * KeePass: 2.39
 * .NET framework: 3.5
