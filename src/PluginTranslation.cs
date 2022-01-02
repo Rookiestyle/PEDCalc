@@ -33,27 +33,86 @@ namespace PluginTranslation
 		private static string LanguageIso6391 = string.Empty;
 		#region Definitions of translated texts go here
 		public const string PluginName = "PEDCalc";
+		/// <summary>
+		/// PEDCalc is active
+		/// </summary>
 		public static readonly string Active = @"PEDCalc is active";
+		/// <summary>
+		/// PEDCalc is inactive
+		/// </summary>
 		public static readonly string Inactive = @"PEDCalc is inactive";
+		/// <summary>
+		/// Recalculate expiry date of all affected entries?
+		/// </summary>
 		public static readonly string AskRecalcAll = @"Recalculate expiry date of all affected entries?";
+		/// <summary>
+		/// Recalculate expiry date?
+		/// </summary>
 		public static readonly string AskRecalcSingle = @"Recalculate expiry date?";
+		/// <summary>
+		/// Inactive
+		/// </summary>
 		public static readonly string OptionsInactive = @"Inactive";
+		/// <summary>
+		/// Inherit: {0}
+		/// </summary>
 		public static readonly string OptionsInherit = @"Inherit: {0}";
+		/// <summary>
+		/// Expire entries
+		/// </summary>
 		public static readonly string OptionsExpire = @"Expire entries";
+		/// <summary>
+		/// days
+		/// </summary>
 		public static readonly string UnitDays = @"days";
+		/// <summary>
+		/// weeks
+		/// </summary>
 		public static readonly string UnitWeeks = @"weeks";
+		/// <summary>
+		/// months
+		/// </summary>
 		public static readonly string UnitMonths = @"months";
+		/// <summary>
+		/// years
+		/// </summary>
 		public static readonly string UnitYears = @"years";
+		/// <summary>
+		/// hours
+		/// </summary>
 		public static readonly string UnitHours = @"hours";
+		/// <summary>
+		/// inherit
+		/// </summary>
 		public static readonly string InheritInherit = @"inherit";
+		/// <summary>
+		/// Could not set expiry date to {0}
+		/// </summary>
 		public static readonly string ErrorInitExpiryDate = @"Could not set expiry date to {0}";
+		/// <summary>
+		/// This is the pre-calculated expiration date.
+		/// It will be set automatically if you change the entry's password.
+		/// 
+		/// To overrride, simply change the expiration date manually.
+		/// </summary>
 		public static readonly string NewExpiryDateTooltip = @"This is the pre-calculated expiration date.
 It will be set automatically if you change the entry's password.
 
 To overrride, simply change the expiration date manually.";
+		/// <summary>
+		/// {0} can affect up to {1} entries in total, {2} out of these {1} will never expire as of now.
+		/// 
+		/// Skip those {2} never expiring entries?
+		/// </summary>
 		public static readonly string ExpireAllEntriesQuestion = @"{0} can affect up to {1} entries in total, {2} out of these {1} will never expire as of now.
 
 Skip those {2} never expiring entries?";
+		/// <summary>
+		/// Do you really want to disable {0}?
+		/// The expiry date of an entry will no longer be recalculated when you change the password.
+		/// 
+		/// This message will only be displayed once.
+		/// </summary>
 		public static readonly string CheckDisable = @"Do you really want to disable {0}?
 The expiry date of an entry will no longer be recalculated when you change the password.
 
