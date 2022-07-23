@@ -139,6 +139,8 @@ namespace PEDCalc
 			m_host.MainWindow.EntryContextMenu.Items.Insert(m_host.MainWindow.EntryContextMenu.Items.Count, m_ContextMenuEntry);
 			m_host.MainWindow.GroupContextMenu.Items.Insert(m_host.MainWindow.GroupContextMenu.Items.Count, m_ContextMenuGroup);
 
+			AddEditQuickEntries();
+
 			try
 			{
 				ToolStripMenuItem last = m_host.MainWindow.MainMenu.Items["m_menuGroup"] as ToolStripMenuItem;
@@ -157,18 +159,41 @@ namespace PEDCalc
 			}
 		}
 
-		private ToolStripMenuItem CreatePEDMenu(bool bGroup, bool bInEntryForm)
+		private ToolStripMenuItem m_ContextMenuEntryQuick = null;
+		private ToolStripMenuItem m_MainMenuEntryQuick = null;
+		private void AddEditQuickEntries()
+        {
+			m_ContextMenuEntryQuick = CreatePEDMenu(false, false);
+			m_MainMenuEntryQuick = CreatePEDMenu(false, false);
+
+			ToolStripMenuItem m = Tools.FindToolStripMenuItem(m_host.MainWindow.EntryContextMenu.Items, "m_ctxEntryEditQuick", true);
+			if (m != null)
+			{
+				m.DropDownItems.Add(m_ContextMenuEntryQuick);
+				m.DropDownOpening += OnMenuOpening;
+			}
+
+			m = Tools.FindToolStripMenuItem(m_host.MainWindow.MainMenu.Items, "m_menuEntryEditQuick", true);
+			if (m != null)
+			{
+				m.DropDownItems.Add(m_MainMenuEntryQuick);
+				m.DropDownOpening += OnMenuOpening;
+			}
+		}
+
+		private ToolStripMenuItem CreatePEDMenu(bool? bGroup, bool bInEntryForm)
 		{
 			ToolStripMenuItem tsmi = new ToolStripMenuItem(PluginTranslate.PluginName + "...");
 			tsmi.Name = "PEDCALC_EntryForm_ContextMenu";
 			tsmi.Image = SmallIcon;
 			tsmi.DropDownOpening += OnPEDMenuOpening;
-			PEDValue_QuickAction qa = new PEDValue_QuickAction(bGroup);
+			PEDValue_QuickAction qa = new PEDValue_QuickAction(bGroup.HasValue ? bGroup.Value : false);
 			if (bInEntryForm)
 				qa.ItemOrButtonClick += OnPEDCalcEntryForm;
 			else
 				qa.ItemOrButtonClick += OnPerformPEDAction;
 			tsmi.DropDown = qa.DropDown;
+			tsmi.Tag = bGroup;
 			return tsmi;
 		}
 
@@ -197,7 +222,7 @@ namespace PEDCalc
 			m_MainMenuGroup.Enabled = m_ContextMenuGroup.Enabled;
 			m_ContextMenuEntry.Enabled = m_host.MainWindow.GetSelectedEntriesCount() >= 1;
 			m_MainMenuEntry.Enabled = m_ContextMenuEntry.Enabled;
-			ToolStripMenuItem tsmi = sender as ToolStripMenuItem;
+			m_ContextMenuEntryQuick.Enabled= m_MainMenuEntryQuick.Enabled = m_ContextMenuEntry.Enabled;
 		}
 
 		private void OnPEDMenuOpening(object sender, EventArgs e)
@@ -207,14 +232,17 @@ namespace PEDCalc
 			if (tsmi.DropDown == null) return;
 			PEDValue_QuickAction pqaActions = tsmi.DropDown.Tag as PEDValue_QuickAction;
 			if (pqaActions == null) return;
-			if ((tsmi == m_ContextMenuEntry) || (tsmi == m_MainMenuEntry))
+			bool? bGroupOrEntry = (bool?)tsmi.Tag;
+			if (bGroupOrEntry.HasValue && !bGroupOrEntry.Value)
+			//if ((tsmi == m_ContextMenuEntry) || (tsmi == m_MainMenuEntry) || (tsmi == m_ContextMenuEntryQuick) || (tsmi == m_MainMenuEntryQuick))
 			{
 				PwEntry[] pe = m_host.MainWindow.GetSelectedEntries();
 				PEDCalcValue pcvInherit = pe[0].GetPEDValueInherit();
 				pqaActions.SetInheritValue(pcvInherit);
 				pqaActions.SetValue(pe[0].GetPEDValue(false));
 			}
-			else if ((tsmi == m_ContextMenuGroup) || (tsmi == m_MainMenuGroup))
+			else if (bGroupOrEntry.HasValue && bGroupOrEntry.Value)
+			//else if ((tsmi == m_ContextMenuGroup) || (tsmi == m_MainMenuGroup))
 			{
 				PwGroup pg = m_host.MainWindow.GetSelectedGroup();
 				PEDCalcValue pcvInherit = pg.GetPEDValueInherit();
@@ -266,7 +294,7 @@ namespace PEDCalc
 			ToolStripDropDown tsdd = (sender as PEDValue_QuickAction).DropDown;
 			if (tsdd == null) return;
 
-			bool bEntry = (m_ContextMenuEntry.DropDown == tsdd) || (m_MainMenuEntry.DropDown == tsdd);
+			bool bEntry = (m_ContextMenuEntry.DropDown == tsdd) || (m_MainMenuEntry.DropDown == tsdd) || (m_ContextMenuEntryQuick.DropDown == tsdd) || (m_MainMenuEntryQuick.DropDown == tsdd);
 			bool bGroup = (m_ContextMenuGroup.DropDown == tsdd) || (m_MainMenuGroup.DropDown == tsdd);
 
 			if (!bEntry && !bGroup) return;
@@ -378,7 +406,7 @@ namespace PEDCalc
 				{
 
 					ctx.Items.Add(new ToolStripSeparator());
-					ToolStripMenuItem tsmiPED = CreatePEDMenu(false, true);
+					ToolStripMenuItem tsmiPED = CreatePEDMenu(null, true);
 					ctx.Items.Add(tsmiPED);
 					PluginDebug.AddSuccess("Found m_ctxDefaultTimes", 0);
 				}
@@ -418,6 +446,7 @@ namespace PEDCalc
 				lNewExpireDate.Left = dtExpireDate.Left;
 				lNewExpireDate.Top = dtExpireDate.Top + dtExpireDate.Height + 2;
 				lNewExpireDate.Width = dtExpireDate.Width;
+				lNewExpireDate.AutoSize = true;
 				ToolTip tt = new ToolTip();
 				tt.ToolTipTitle = PluginTranslate.PluginName;
 				tt.ToolTipIcon = ToolTipIcon.Info;
@@ -455,7 +484,7 @@ namespace PEDCalc
 			}
 		}
 
-		private void CheckShowNewExpireDate()
+        private void CheckShowNewExpireDate()
 		{
 			if (m_pweForm == null) return;
 
