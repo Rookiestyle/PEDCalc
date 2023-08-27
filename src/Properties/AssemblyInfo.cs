@@ -8,16 +8,16 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("PEDCalc - Password Expiry Calculator")]
-[assembly: AssemblyDescription ("Calculates the password expiration date dynamically after changing the password")]
-[assembly: AssemblyConfiguration ("")]
-[assembly: AssemblyCompany ("rookiestyle")]
-[assembly: AssemblyProduct ("KeePass Plugin")]
+[assembly: AssemblyDescription("Calculates the password expiration date dynamically after changing the password")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("rookiestyle")]
+[assembly: AssemblyProduct("KeePass Plugin")]
 [assembly: AssemblyCopyright("Copyright 2021-2022")]
-[assembly: AssemblyTrademark ("")]
-[assembly: AssemblyCulture ("")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
 // This sets the default COM visibility of types in the assembly to invisible.
 // If you need to expose a type to COM, use [ComVisible(true)] on that type.
-[assembly: ComVisible (false)]
+[assembly: ComVisible(false)]
 // The assembly version has following format :
 //
 // Major.Minor.Build.Revision
