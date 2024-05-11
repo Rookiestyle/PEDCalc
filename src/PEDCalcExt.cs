@@ -424,8 +424,6 @@ namespace PEDCalc
         dtExpireDate.ValueChanged += (o, e1) => CheckShowNewExpireDate();
         SecureTextBoxEx password = (SecureTextBoxEx)Tools.GetControl("m_tbPassword", m_pweForm);
         password.TextChanged += (o, e1) => CheckShowNewExpireDate();
-        Label lNewExpireDate = new Label();
-        lNewExpireDate.Name = "PEDCalc_NewExpireDate";
         string sDate = string.Empty;
         m_iSelectedEntries = (int)m_host.MainWindow.GetSelectedEntriesCount();
         if ((Tools.KeePassVersion >= Configuration.KeePassMultipleEntries) && (m_iSelectedEntries > 1))
@@ -442,15 +440,7 @@ namespace PEDCalc
           sDate = expiry.ToLongTimeString();
         else
           sDate = expiry.ToString(dtExpireDate.CustomFormat);
-        lNewExpireDate.Text = PluginTranslate.PluginName + ": " + sDate;
-        lNewExpireDate.Left = dtExpireDate.Left;
-        lNewExpireDate.Top = dtExpireDate.Top + dtExpireDate.Height + 2;
-        lNewExpireDate.Width = dtExpireDate.Width;
-        lNewExpireDate.AutoSize = true;
-        ToolTip tt = new ToolTip();
-        tt.ToolTipTitle = PluginTranslate.PluginName;
-        tt.ToolTipIcon = ToolTipIcon.Info;
-        tt.SetToolTip(lNewExpireDate, PluginTranslate.NewExpiryDateTooltip);
+        Label lNewExpireDate = GetNewExpireDateLabel(sDate, dtExpireDate);
         dtExpireDate.Parent.Controls.Add(lNewExpireDate);
         int h = dtExpireDate.Parent.ClientSize.Height;
         if (h < lNewExpireDate.Top + lNewExpireDate.Height + 2)
@@ -484,11 +474,42 @@ namespace PEDCalc
       }
     }
 
+    private Label GetNewExpireDateLabel()
+    {
+      return GetNewExpireDateLabel(false, null, null);
+    }
+
+    private Label GetNewExpireDateLabel(string sText, Control cRefControl)
+    {
+      return GetNewExpireDateLabel(true, sText, cRefControl);
+    }
+
+    private Label GetNewExpireDateLabel(bool bCreateIfNotExists, string sText, Control cRefControl)
+    {
+      Label lNewExpireDate = (Label)Tools.GetControl("PEDCalc_NewExpireDate", m_pweForm);
+      if (lNewExpireDate == null && !bCreateIfNotExists) return null;
+      if (lNewExpireDate != null) return lNewExpireDate;
+      lNewExpireDate = new Label();
+      lNewExpireDate.Name = "PEDCalc_NewExpireDate";
+      lNewExpireDate.Text = PluginTranslate.PluginName + ": " + sText;
+      lNewExpireDate.Left = cRefControl.Left;
+      lNewExpireDate.Top = cRefControl.Top + cRefControl.Height + 2;
+      lNewExpireDate.Width = cRefControl.Width;
+      lNewExpireDate.AutoSize = true;
+
+      ToolTip tt = new ToolTip();
+      tt.ToolTipTitle = PluginTranslate.PluginName;
+      tt.ToolTipIcon = ToolTipIcon.Info;
+      tt.SetToolTip(lNewExpireDate, PluginTranslate.NewExpiryDateTooltip);
+
+      return lNewExpireDate;
+    }
+
     private void CheckShowNewExpireDate()
     {
       if (m_pweForm == null) return;
 
-      Label lNewExpireDate = (Label)Tools.GetControl("PEDCalc_NewExpireDate", m_pweForm);
+      Label lNewExpireDate = GetNewExpireDateLabel();
       if (lNewExpireDate == null) return;
       lNewExpireDate.Visible = false;
 
